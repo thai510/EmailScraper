@@ -3,9 +3,9 @@
 import sys
 import urllib2
 import re
+import fileinput
 
-def getAddress():
-	url = raw_input("Site to scrape: ")
+def getAddress(url):
 	http = "http://"
 	https = "https://"
 
@@ -17,14 +17,17 @@ def getAddress():
 		url = "http://" + url
 		return url
 
-def parseAddress():
+def parseAddress(url):
 	try:
-		website = urllib2.urlopen(getAddress())
+		website = urllib2.urlopen(getAddress(url))
 		html = website.read()
 
 		addys = re.findall('''[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?''', html, flags=re.IGNORECASE)
 
 		print addys
+                f = open('output.txt', 'a+')
+                f.write(str(addys) + "\n")
+                f.close
 
 	except urllib2.HTTPError, err:
 		print "Cannot retrieve URL: HTTP Error Code: ", err.code
@@ -32,7 +35,8 @@ def parseAddress():
 		print "Cannot retrive URL: " + err.reason[1]
 
 def execute():
-	parseAddress()
+        for line in fileinput.input():
+            parseAddress(line)
 
 ### MAIN
 
